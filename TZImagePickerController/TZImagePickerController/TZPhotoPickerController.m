@@ -550,8 +550,8 @@ static CGFloat itemMargin = 5;
                 return;
             }
 
-            NSUInteger maxMemorySize = tzImagePickerVc.maxMemorySize;
-            if (maxMemorySize > 0 && model.oDataLength == 0) {
+            NSUInteger maxOriginalSize = tzImagePickerVc.maxOriginalSize;
+            if (maxOriginalSize > 0 && model.oDataLength == 0) {
 
                 if (model.oDataLength == 0) {
 
@@ -560,7 +560,7 @@ static CGFloat itemMargin = 5;
                         model.oDataLength = dataLength;
                         [tzImagePickerVc hideProgressHUD];
 
-                        if (dataLength > maxMemorySize) {
+                        if (dataLength > maxOriginalSize) {
 
                             NSString *title = @"图片过大";
                             [tzImagePickerVc showAlertWithTitle:title];
@@ -571,7 +571,7 @@ static CGFloat itemMargin = 5;
                     }];
                 } else {
 
-                    if (model.oDataLength > maxMemorySize) {
+                    if (model.oDataLength > maxOriginalSize) {
 
                         NSString *title = @"图片过大";
                         [tzImagePickerVc showAlertWithTitle:title];

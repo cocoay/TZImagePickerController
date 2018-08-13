@@ -165,7 +165,7 @@
     [_doneButton setTitleColor:_tzImagePickerVc.oKButtonTitleColorNormal forState:UIControlStateNormal];
     [_doneButton setTitleColor:_tzImagePickerVc.oKButtonTitleColorDisabled forState:UIControlStateDisabled];
     // 限制大小时必须先选择一张
-    _doneButton.enabled = (_tzImagePickerVc.selectedModels.count > 0 && _tzImagePickerVc.maxMemorySize > 0) || _tzImagePickerVc.maxMemorySize == 0;
+    _doneButton.enabled = (_tzImagePickerVc.selectedModels.count > 0 && _tzImagePickerVc.maxOriginalSize > 0) || _tzImagePickerVc.maxOriginalSize == 0;
 
     _numberImageView = [[UIImageView alloc] initWithImage:_tzImagePickerVc.photoNumberIconImage];
     _numberImageView.backgroundColor = [UIColor clearColor];
@@ -319,8 +319,8 @@
                 return;
             }
             
-            NSUInteger maxMemorySize = _tzImagePickerVc.maxMemorySize;
-            if (maxMemorySize > 0) {
+            NSUInteger maxOriginalSize = _tzImagePickerVc.maxOriginalSize;
+            if (maxOriginalSize > 0) {
                 
                 if (model.oDataLength == 0) {
                     
@@ -333,7 +333,7 @@
                         
                         model.oDataLength = dataLength;
                         [strongImagePickerVc hideProgressHUD];
-                        if (dataLength > maxMemorySize) {
+                        if (dataLength > maxOriginalSize) {
                             
                             NSString *title = @"图片过大";
                             [strongImagePickerVc showAlertWithTitle:title];
@@ -344,7 +344,7 @@
                     }];
                 } else {
                     
-                    if (model.oDataLength > maxMemorySize) {
+                    if (model.oDataLength > maxOriginalSize) {
                         
                         NSString *title = @"图片过大";
                         [_tzImagePickerVc showAlertWithTitle:title];
@@ -397,8 +397,8 @@
             [UIView showOscillatoryAnimationWithLayer:selectButton.imageView.layer type:TZOscillatoryAnimationToBigger];
         }
         [UIView showOscillatoryAnimationWithLayer:_numberImageView.layer type:TZOscillatoryAnimationToSmaller];
-        if (_tzImagePickerVc.maxMemorySize > 0) {
-            self.doneButton.enabled = (_tzImagePickerVc.selectedModels.count > 0 && _tzImagePickerVc.maxMemorySize > 0) || _tzImagePickerVc.maxMemorySize == 0;
+        if (_tzImagePickerVc.maxOriginalSize > 0) {
+            self.doneButton.enabled = (_tzImagePickerVc.selectedModels.count > 0 && _tzImagePickerVc.maxOriginalSize > 0) || _tzImagePickerVc.maxOriginalSize == 0;
         }
     }
 }
@@ -422,7 +422,7 @@
         [UIView showOscillatoryAnimationWithLayer:self.selectButton.imageView.layer type:TZOscillatoryAnimationToBigger];
     }
     [UIView showOscillatoryAnimationWithLayer:self.numberImageView.layer type:TZOscillatoryAnimationToSmaller];
-    self.doneButton.enabled = (tzImagePickerVc.selectedModels.count > 0 && tzImagePickerVc.maxMemorySize > 0) || tzImagePickerVc.maxMemorySize == 0;
+    self.doneButton.enabled = (tzImagePickerVc.selectedModels.count > 0 && tzImagePickerVc.maxOriginalSize > 0) || tzImagePickerVc.maxOriginalSize == 0;
 }
 
 - (void)backButtonClick {

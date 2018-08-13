@@ -323,7 +323,7 @@
     imagePickerVc.showSelectBtn = NO;
     imagePickerVc.allowCrop = self.allowCropSwitch.isOn;
     imagePickerVc.needCircleCrop = self.needCircleCropSwitch.isOn;
-    imagePickerVc.maxMemorySize = 3 * 1024 * 1024;
+    imagePickerVc.maxOriginalSize = 3 * 1024 * 1024;
     // 设置竖屏下的裁剪尺寸
     NSInteger left = 30;
     NSInteger widthHeight = self.view.tz_width - 2 * left;
