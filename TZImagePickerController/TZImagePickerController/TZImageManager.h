@@ -93,6 +93,9 @@
 /// Deprecated, Use -getVideoOutputPathWithAsset:failure:success:
 - (void)getVideoOutputPathWithAsset:(id)asset completion:(void (^)(NSString *outputPath))completion __attribute__((deprecated("Use -getVideoOutputPathWithAsset:failure:success:")));
 
+/// Get photo bytes 获得一张照片的大小
+- (void)getPhotoDataLengthWithModel:(TZAssetModel *)model completion:(void (^)(NSUInteger dataLength))completion;
+
 /// Get photo bytes 获得一组照片的大小
 - (void)getPhotosBytesWithArray:(NSArray *)photos completion:(void (^)(NSString *totalBytes))completion;
 

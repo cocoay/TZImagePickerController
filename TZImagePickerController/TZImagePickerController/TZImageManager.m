@@ -406,6 +406,32 @@ static dispatch_once_t onceToken;
     return newTime;
 }
 
+/// Get photo bytes 获得一张照片的大小
+- (void)getPhotoDataLengthWithModel:(TZAssetModel *)model completion:(void (^)(NSUInteger dataLength))completion {
+    if (!model) {
+        if (completion) completion(0);
+        return;
+    }
+    
+    __block NSInteger dataLength = 0;
+    if ([model.asset isKindOfClass:[PHAsset class]]) {
+        PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+        options.resizeMode = PHImageRequestOptionsResizeModeFast;
+        options.networkAccessAllowed = YES;
+        if ([[model.asset valueForKey:@"filename"] hasSuffix:@"GIF"]) {
+            options.version = PHImageRequestOptionsVersionOriginal;
+        }
+        [[PHImageManager defaultManager] requestImageDataForAsset:model.asset options:options resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
+            if (model.type != TZAssetModelMediaTypeVideo) dataLength = imageData.length;
+            if (completion) completion(dataLength);
+        }];
+    } else if ([model.asset isKindOfClass:[ALAsset class]]) {
+        ALAssetRepresentation *representation = [model.asset defaultRepresentation];
+        if (model.type != TZAssetModelMediaTypeVideo) dataLength = (NSUInteger)representation.size;
+        if (completion) completion(dataLength);
+    }
+}
+
 /// Get photo bytes 获得一组照片的大小
 - (void)getPhotosBytesWithArray:(NSArray *)photos completion:(void (^)(NSString *totalBytes))completion {
     if (!photos || !photos.count) {

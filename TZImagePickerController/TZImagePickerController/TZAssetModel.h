@@ -27,6 +27,9 @@ typedef enum : NSUInteger {
 @property (nonatomic, copy) NSString *timeLength;
 @property (strong, nonatomic) UIImage *cachedImage;
 
+/// 原图大小
+@property (nonatomic, assign) NSUInteger oDataLength;
+
 /// Init a photo dataModel With a asset
 /// 用一个PHAsset/ALAsset实例，初始化一个照片模型
 + (instancetype)modelWithAsset:(id)asset type:(TZAssetModelMediaType)type;

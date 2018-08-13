@@ -24,7 +24,6 @@
     UIView *_bottomToolBar;
     UIButton *_previewButton;
     UIButton *_doneButton;
-    UIImageView *_numberImageView;
     UILabel *_numberLabel;
     UIButton *_originalPhotoButton;
     UILabel *_originalPhotoLabel;
@@ -42,6 +41,9 @@
 @property (nonatomic, strong) UIImagePickerController *imagePickerVc;
 @property (strong, nonatomic) CLLocation *location;
 @property (assign, nonatomic) BOOL useCachedImage;
+@property (strong, nonatomic) UIImageView *numberImageView;
+
+
 @end
 
 static CGSize AssetGridThumbnailSize;
@@ -539,30 +541,79 @@ static CGFloat itemMargin = 5;
             }
             [UIView showOscillatoryAnimationWithLayer:strongLayer type:TZOscillatoryAnimationToSmaller];
         } else {
-            // 2. select:check if over the maxImagesCount / 选择照片,检查是否超过了最大个数的限制
-            if (tzImagePickerVc.selectedModels.count < tzImagePickerVc.maxImagesCount) {
-                if (tzImagePickerVc.maxImagesCount == 1 && !tzImagePickerVc.allowPreview) {
-                    model.isSelected = YES;
-                    [tzImagePickerVc addSelectedModel:model];
-                    [strongSelf doneButtonClick];
-                    return;
-                }
-                strongCell.selectPhotoButton.selected = YES;
-                model.isSelected = YES;
-                if (tzImagePickerVc.showSelectedIndex || tzImagePickerVc.showPhotoCannotSelectLayer) {
-                    model.needOscillatoryAnimation = YES;
-                    [strongSelf setUseCachedImageAndReloadData];
-                }
-                [tzImagePickerVc addSelectedModel:model];
-                [strongSelf refreshBottomToolBarStatus];
-                [UIView showOscillatoryAnimationWithLayer:strongLayer type:TZOscillatoryAnimationToSmaller];
-            } else {
-                NSString *title = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"Select a maximum of %zd photos"], tzImagePickerVc.maxImagesCount];
+            
+            if (!tzImagePickerVc.allowPickingGif &&
+                model.type == TZAssetModelMediaTypePhotoGif) {
+
+                NSString *title = @"禁止选择GIF图";
                 [tzImagePickerVc showAlertWithTitle:title];
+                return;
+            }
+
+            NSUInteger maxMemorySize = tzImagePickerVc.maxMemorySize;
+            if (maxMemorySize > 0 && model.oDataLength == 0) {
+
+                if (model.oDataLength == 0) {
+
+                    [tzImagePickerVc showProgressHUD];
+                    [[TZImageManager manager] getPhotoDataLengthWithModel:model completion:^(NSUInteger dataLength) {
+                        model.oDataLength = dataLength;
+                        [tzImagePickerVc hideProgressHUD];
+
+                        if (dataLength > maxMemorySize) {
+
+                            NSString *title = @"图片过大";
+                            [tzImagePickerVc showAlertWithTitle:title];
+                        } else {
+
+                            [strongSelf _didSelectPhotoWithCell:strongCell model:model];
+                        }
+                    }];
+                } else {
+
+                    if (model.oDataLength > maxMemorySize) {
+
+                        NSString *title = @"图片过大";
+                        [tzImagePickerVc showAlertWithTitle:title];
+                    } else {
+
+                        [strongSelf _didSelectPhotoWithCell:strongCell model:model];
+                    }
+                }
+            } else {
+            
+                [strongSelf _didSelectPhotoWithCell:strongCell model:model];
             }
         }
     };
     return cell;
+}
+
+- (void)_didSelectPhotoWithCell:(TZAssetCell *)cell model:(TZAssetModel *)model{
+    
+    TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
+    
+    // 2. select:check if over the maxImagesCount / 选择照片,检查是否超过了最大个数的限制
+    if (tzImagePickerVc.selectedModels.count < tzImagePickerVc.maxImagesCount) {
+        if (tzImagePickerVc.maxImagesCount == 1 && !tzImagePickerVc.allowPreview) {
+            model.isSelected = YES;
+            [tzImagePickerVc addSelectedModel:model];
+            [self doneButtonClick];
+            return;
+        }
+        cell.selectPhotoButton.selected = YES;
+        model.isSelected = YES;
+        if (tzImagePickerVc.showSelectedIndex || tzImagePickerVc.showPhotoCannotSelectLayer) {
+            model.needOscillatoryAnimation = YES;
+            [self setUseCachedImageAndReloadData];
+        }
+        [tzImagePickerVc addSelectedModel:model];
+        [self refreshBottomToolBarStatus];
+        [UIView showOscillatoryAnimationWithLayer:self.numberImageView.layer type:TZOscillatoryAnimationToSmaller];
+    } else {
+        NSString *title = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"Select a maximum of %zd photos"], tzImagePickerVc.maxImagesCount];
+        [tzImagePickerVc showAlertWithTitle:title];
+    }
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -883,7 +934,7 @@ static CGFloat itemMargin = 5;
 }
 
 - (void)dealloc {
-    // NSLog(@"%@ dealloc",NSStringFromClass(self.class));
+//     NSLog(@"%@ dealloc",NSStringFromClass(self.class));
 }
 
 #pragma mark - Asset Caching

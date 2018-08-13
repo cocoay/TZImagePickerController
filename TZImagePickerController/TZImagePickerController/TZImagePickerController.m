@@ -160,6 +160,7 @@
     albumPickerVc.columnNumber = columnNumber;
     self = [super initWithRootViewController:albumPickerVc];
     if (self) {
+        self.maxMemorySize = 0; // Default is 0B, 0 is not limited / 默认限制图片内存大小, 0为不限制
         self.maxImagesCount = maxImagesCount > 0 ? maxImagesCount : 9; // Default is 9 / 默认最大可选9张图片
         self.pickerDelegate = delegate;
         self.selectedAssets = [NSMutableArray array];
@@ -778,7 +779,7 @@
 }
 
 - (void)dealloc {
-    // NSLog(@"%@ dealloc",NSStringFromClass(self.class));
+//     NSLog(@"%@ dealloc",NSStringFromClass(self.class));
 }
 
 #pragma mark - Layout
